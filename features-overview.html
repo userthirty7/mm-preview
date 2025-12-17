@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: #111;
+            background: #fafafa;
+            font-size: 15px;
+        }
+
+        .header {
+            background: #111;
+            color: #fff;
+            padding: 80px 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 64px 24px;
+        }
+
+        .section {
+            margin-bottom: 64px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        .section p {
+            color: #444;
+            line-height: 1.7;
+            max-width: 600px;
+        }
+
+        .structure-box {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 32px;
+            margin-top: 24px;
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-radius: 6px;
+        }
+
+        .tree-item:hover {
+            background: #f5f5f5;
+        }
+
+        .tree-item.l1 { padding-left: 40px; }
+        .tree-item.l2 { padding-left: 64px; }
+        .tree-item.l3 { padding-left: 88px; }
+
+        .tree-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            flex-shrink: 0;
+        }
+
+        .tree-item.org .tree-dot { background: #111; }
+        .tree-item.artist .tree-dot { background: #666; }
+        .tree-item.project .tree-dot { background: #999; }
+
+        .tree-label {
+            font-weight: 500;
+        }
+
+        .tree-meta {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .example-box {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 24px 32px;
+            margin-top: 16px;
+        }
+
+        .example-box .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .example-flow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+
+        .example-flow span {
+            background: #f5f5f5;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .example-flow .arrow {
+            background: none;
+            padding: 0;
+            color: #ccc;
+        }
+
+        .example-box.detailed {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .example-box.detailed .label {
+            padding: 16px 24px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e5e5e5;
+            margin: 0;
+        }
+
+        .example-tree {
+            padding: 8px 0;
+        }
+
+        .ex-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            border-left: 3px solid transparent;
+        }
+
+        .ex-row.org { padding-left: 24px; border-color: #111; background: #fafafa; }
+        .ex-row.artist { padding-left: 48px; border-color: #444; }
+        .ex-row.project { padding-left: 72px; border-color: #888; background: #fafafa; }
+        .ex-row.track { padding-left: 96px; border-color: #bbb; }
+        .ex-row.track.other { color: #888; }
+
+        .ex-name {
+            font-weight: 500;
+        }
+
+        .ex-type {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ex-files {
+            padding: 16px 24px 16px 96px;
+            background: #f5f5f5;
+            border-left: 3px solid #ddd;
+        }
+
+        .ex-files.track-files {
+            padding-left: 120px;
+        }
+
+        .ex-files-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .ex-file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .ex-file {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'SF Mono', Monaco, monospace;
+            color: #555;
+        }
+
+        .share-features {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: #e5e5e5;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .share-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 24px;
+            background: #fff;
+        }
+
+        .share-icon {
+            flex-shrink: 0;
+            color: #666;
+        }
+
+        .share-icon svg {
+            display: block;
+        }
+
+        .share-feature h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .share-feature p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .pipeline-preview {
+            margin-top: 24px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .pipeline-header {
+            display: grid;
+            grid-template-columns: 140px repeat(5, 1fr);
+            gap: 8px;
+            padding: 14px 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e5e5e5;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+        }
+
+        .pipeline-col {
+            text-align: center;
+        }
+
+        .pipeline-col:first-child {
+            text-align: left;
+        }
+
+        .pipeline-row {
+            display: grid;
+            grid-template-columns: 140px repeat(5, 1fr);
+            gap: 8px;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+        }
+
+        .pipeline-row:last-child {
+            border-bottom: none;
+        }
+
+        .pipeline-track {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .pipeline-check {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pipeline-check.done {
+            background: #111;
+            border-color: #111;
+            color: #fff;
+        }
+
+        .pipeline-check svg {
+            display: block;
+        }
+
+        .tasks-preview {
+            margin-top: 24px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tasks-header {
+            display: grid;
+            grid-template-columns: 1fr 140px 120px;
+            gap: 16px;
+            padding: 14px 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e5e5e5;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+        }
+
+        .task-row {
+            display: grid;
+            grid-template-columns: 28px 1fr 140px 120px;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+        }
+
+        .task-row:last-child {
+            border-bottom: none;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-checkbox.done {
+            background: #111;
+            border-color: #111;
+            color: #fff;
+        }
+
+        .task-checkbox svg {
+            display: block;
+        }
+
+        .task-name {
+            font-size: 14px;
+        }
+
+        .task-assignee {
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .task-assignee.user {
+            background: #e8f4ff;
+            color: #1a6dca;
+        }
+
+        .task-assignee.dept {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .task-assignee.unassigned {
+            background: #f5f5f5;
+            color: #888;
+        }
+
+        .task-status {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .task-status.complete {
+            color: #16a34a;
+        }
+
+        .task-status.progress {
+            color: #ca8a04;
+        }
+
+        .task-status.pending {
+            color: #888;
+        }
+
+        .lyrics-preview {
+            margin-top: 24px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .lyrics-dialog-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .lyrics-dialog-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .lyrics-dialog-subtitle {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .lyrics-dialog-body {
+            padding: 20px 24px;
+        }
+
+        .lyrics-player-box {
+            background: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+        }
+
+        .lyrics-player-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .waveform {
+            height: 60px;
+            margin-bottom: 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .waveform svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .lyrics-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lyrics-play-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            border-radius: 6px;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lyrics-play-btn svg {
+            display: block;
+            margin-left: 2px;
+        }
+
+        .lyrics-time {
+            font-size: 13px;
+            color: #888;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .lyrics-volume {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #888;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .volume-fill {
+            width: 70%;
+            height: 100%;
+            background: #888;
+            border-radius: 2px;
+        }
+
+        .lyrics-textarea-wrapper {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .lyrics-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+            white-space: pre-wrap;
+            background: #fff;
+        }
+
+        .lyrics-dialog-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .lyrics-cancel-btn {
+            padding: 10px 20px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        .lyrics-save-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #111;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .contracts-preview {
+            margin-top: 24px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .contracts-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .contracts-tab {
+            padding: 8px 16px;
+            font-size: 13px;
+            color: #666;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contracts-tab.active {
+            background: #fff;
+            color: #111;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .contracts-badge {
+            background: #e5e5e5;
+            color: #666;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .contracts-badge.warn {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .contracts-list {
+            padding: 8px 0;
+        }
+
+        .contract-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 16px;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .contract-row:last-child {
+            border-bottom: none;
+        }
+
+        .contract-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .contract-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .contract-name {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .contract-meta {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .contract-meta strong {
+            color: #555;
+        }
+
+        .contract-status {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .contract-status.active {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .contract-status.expiring {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .contract-expiry {
+            font-size: 13px;
+            color: #888;
+            text-align: right;
+            min-width: 120px;
+        }
+
+        .contract-expiry.warn {
+            color: #b45309;
+            font-weight: 500;
+        }
+
+        .contracts-assign-preview {
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .contracts-assign-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .contracts-assign-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .assign-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .assign-option svg {
+            color: #888;
+        }
+
+        .invoices-preview {
+            margin-top: 24px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .invoices-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .invoice-stat {
+            padding: 20px 24px;
+            border-right: 1px solid #e5e5e5;
+        }
+
+        .invoice-stat:last-child {
+            border-right: none;
+        }
+
+        .invoice-stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .invoice-stat:nth-child(2) .invoice-stat-value {
+            color: #dc2626;
+        }
+
+        .invoice-stat:nth-child(3) .invoice-stat-value {
+            color: #16a34a;
+        }
+
+        .invoice-stat-label {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .invoices-list {
+            padding: 0;
+        }
+
+        .invoices-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 120px 100px;
+            gap: 16px;
+            padding: 12px 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e5e5e5;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+        }
+
+        .invoice-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 120px 100px;
+            gap: 16px;
+            padding: 14px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            align-items: center;
+        }
+
+        .invoice-row:last-child {
+            border-bottom: none;
+        }
+
+        .invoice-id {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .invoice-number {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .invoice-date {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .invoice-client {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .invoice-amount {
+            font-size: 14px;
+            font-weight: 500;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .invoice-status {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .invoice-status.paid {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .invoice-status.pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .invoice-status.overdue {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .invoices-actions {
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            gap: 12px;
+        }
+
+        .invoice-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .invoice-action-btn.primary {
+            background: #111;
+            border-color: #111;
+            color: #fff;
+        }
+
+        .invoice-action-btn svg {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 640px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .features-list {
+            margin-top: 24px;
+        }
+
+        .feature-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .feature-row:last-child {
+            border-bottom: none;
+        }
+
+        .feature-row h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            min-width: 160px;
+        }
+
+        .feature-row p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Music Manager</h1>
+        <p>Manage projects, teams, and assets in one place</p>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <div class="section-label">Core Feature</div>
+            <h2>Project Structure</h2>
+            <p>Organise your entire catalogue with a clear hierarchy. Every file, every track, every project — all in one place.</p>
+
+            <div class="structure-box">
+                <div class="tree">
+                    <div class="tree-item org">
+                        <div class="tree-dot"></div>
+                        <span class="tree-label">Organisation</span>
+                        <span class="tree-meta">Your label or management company</span>
+                    </div>
+                    <div class="tree-item artist l1">
+                        <div class="tree-dot"></div>
+                        <span class="tree-label">Artist</span>
+                        <span class="tree-meta">Individual artists on your roster</span>
+                    </div>
+                    <div class="tree-item project l2">
+                        <div class="tree-dot"></div>
+                        <span class="tree-label">Project</span>
+                        <span class="tree-meta">Album, EP, or Single</span>
+                    </div>
+                    <div class="tree-item l3">
+                        <div class="tree-dot"></div>
+                        <span class="tree-label">Track</span>
+                        <span class="tree-meta">Individual songs with their files</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-box detailed">
+                <div class="label">Example</div>
+                <div class="example-tree">
+                    <div class="ex-row org">
+                        <span class="ex-name">Ybeeze</span>
+                        <span class="ex-type">Organisation</span>
+                    </div>
+                    <div class="ex-row artist">
+                        <span class="ex-name">Central Cee</span>
+                        <span class="ex-type">Artist</span>
+                    </div>
+                    <div class="ex-row project">
+                        <span class="ex-name">Cant Rush Greatness</span>
+                        <span class="ex-type">Album</span>
+                    </div>
+                    <div class="ex-files">
+                        <div class="ex-files-label">Project Files</div>
+                        <div class="ex-file-list">
+                            <span class="ex-file">Album_Contract.pdf</span>
+                            <span class="ex-file">Album_Artwork.psd</span>
+                            <span class="ex-file">Press_Release.docx</span>
+                            <span class="ex-file">Distribution_Agreement.pdf</span>
+                        </div>
+                    </div>
+                    <div class="ex-row track">
+                        <span class="ex-name">No Introduction</span>
+                        <span class="ex-type">Track 1</span>
+                    </div>
+                    <div class="ex-files track-files">
+                        <div class="ex-files-label">Track Files</div>
+                        <div class="ex-file-list">
+                            <span class="ex-file">No_Introduction_Master.wav</span>
+                            <span class="ex-file">No_Introduction_Stems.zip</span>
+                            <span class="ex-file">Lyrics.txt</span>
+                            <span class="ex-file">Music_Video_Final.mp4</span>
+                            <span class="ex-file">Publishing_Split.pdf</span>
+                        </div>
+                    </div>
+                    <div class="ex-row track other">
+                        <span class="ex-name">5 Star, GBP, CRG...</span>
+                        <span class="ex-type">More Tracks</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-label">Sharing</div>
+            <h2>Share securely from one place</h2>
+            <p>Your files live in one central hub. When you need to share, create a link with full control over who can access it and for how long.</p>
+
+            <div class="share-features">
+                <div class="share-feature">
+                    <div class="share-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    </div>
+                    <div>
+                        <h3>Shareable Links</h3>
+                        <p>Generate a link for any file, track, or project. Share masters with the label, send lyrics to collaborators, or deliver finals to clients.</p>
+                    </div>
+                </div>
+                <div class="share-feature">
+                    <div class="share-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div>
+                        <h3>Password Protection</h3>
+                        <p>Add a password to any link. Only people with the password can access the content.</p>
+                    </div>
+                </div>
+                <div class="share-feature">
+                    <div class="share-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div>
+                        <h3>Access Limits</h3>
+                        <p>Set how many times a link can be opened. Once the limit is reached, the link expires automatically.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-label">Progress Tracking</div>
+            <h2>Pipeline</h2>
+            <p>See where every track is at a glance. Track progress through each stage from recording to release.</p>
+
+            <div class="pipeline-preview">
+                <div class="pipeline-header">
+                    <span class="pipeline-col">Track</span>
+                    <span class="pipeline-col">Recording</span>
+                    <span class="pipeline-col">Mixing</span>
+                    <span class="pipeline-col">Mastering</span>
+                    <span class="pipeline-col">Artwork</span>
+                    <span class="pipeline-col">Released</span>
+                </div>
+                <div class="pipeline-row">
+                    <span class="pipeline-track">No Introduction</span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                </div>
+                <div class="pipeline-row">
+                    <span class="pipeline-track">5 Star</span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check"></span>
+                    <span class="pipeline-check"></span>
+                </div>
+                <div class="pipeline-row">
+                    <span class="pipeline-track">GBP</span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check"></span>
+                    <span class="pipeline-check"></span>
+                    <span class="pipeline-check"></span>
+                </div>
+                <div class="pipeline-row">
+                    <span class="pipeline-track">CRG</span>
+                    <span class="pipeline-check done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="pipeline-check"></span>
+                    <span class="pipeline-check"></span>
+                    <span class="pipeline-check"></span>
+                    <span class="pipeline-check"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-label">Task Management</div>
+            <h2>Tasks</h2>
+            <p>Notion-style task management. Assign work to departments or individuals and track progress across your team.</p>
+
+            <div class="tasks-preview">
+                <div class="tasks-header">
+                    <span class="tasks-col-task">Task</span>
+                    <span class="tasks-col">Assignee</span>
+                    <span class="tasks-col">Status</span>
+                </div>
+                <div class="task-row">
+                    <span class="task-checkbox done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="task-name">Finalise album artwork</span>
+                    <span class="task-assignee dept">Creative</span>
+                    <span class="task-status complete">Complete</span>
+                </div>
+                <div class="task-row">
+                    <span class="task-checkbox done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                    <span class="task-name">Send masters to distributor</span>
+                    <span class="task-assignee user">James T.</span>
+                    <span class="task-status complete">Complete</span>
+                </div>
+                <div class="task-row">
+                    <span class="task-checkbox"></span>
+                    <span class="task-name">Review publishing splits</span>
+                    <span class="task-assignee dept">Legal</span>
+                    <span class="task-status progress">In Progress</span>
+                </div>
+                <div class="task-row">
+                    <span class="task-checkbox"></span>
+                    <span class="task-name">Schedule music video shoot</span>
+                    <span class="task-assignee user">Sarah M.</span>
+                    <span class="task-status pending">Pending</span>
+                </div>
+                <div class="task-row">
+                    <span class="task-checkbox"></span>
+                    <span class="task-name">Upload press assets</span>
+                    <span class="task-assignee unassigned">Unassigned</span>
+                    <span class="task-status pending">Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-label">Workflow</div>
+            <h2>Lyrics Generation</h2>
+            <p>Upload audio to get transcribed lyrics. Play back while editing to refine them until they're perfect.</p>
+
+            <div class="lyrics-preview">
+                <div class="lyrics-dialog-header">
+                    <div class="lyrics-dialog-title">Generated Lyrics</div>
+                    <div class="lyrics-dialog-subtitle">No_Introduction_Master.wav</div>
+                </div>
+
+                <div class="lyrics-dialog-body">
+                    <div class="lyrics-player-box">
+                        <div class="lyrics-player-label">Play audio to review</div>
+                        <div class="waveform">
+                            <svg viewBox="0 0 400 60" preserveAspectRatio="none">
+                                <rect x="0" y="22" width="3" height="16" rx="1" fill="#3b82f6"/>
+                                <rect x="5" y="16" width="3" height="28" rx="1" fill="#3b82f6"/>
+                                <rect x="10" y="10" width="3" height="40" rx="1" fill="#3b82f6"/>
+                                <rect x="15" y="18" width="3" height="24" rx="1" fill="#3b82f6"/>
+                                <rect x="20" y="6" width="3" height="48" rx="1" fill="#3b82f6"/>
+                                <rect x="25" y="14" width="3" height="32" rx="1" fill="#3b82f6"/>
+                                <rect x="30" y="20" width="3" height="20" rx="1" fill="#3b82f6"/>
+                                <rect x="35" y="8" width="3" height="44" rx="1" fill="#3b82f6"/>
+                                <rect x="40" y="16" width="3" height="28" rx="1" fill="#3b82f6"/>
+                                <rect x="45" y="4" width="3" height="52" rx="1" fill="#3b82f6"/>
+                                <rect x="50" y="12" width="3" height="36" rx="1" fill="#3b82f6"/>
+                                <rect x="55" y="20" width="3" height="20" rx="1" fill="#3b82f6"/>
+                                <rect x="60" y="14" width="3" height="32" rx="1" fill="#3b82f6"/>
+                                <rect x="65" y="8" width="3" height="44" rx="1" fill="#3b82f6"/>
+                                <rect x="70" y="18" width="3" height="24" rx="1" fill="#3b82f6"/>
+                                <rect x="75" y="10" width="3" height="40" rx="1" fill="#3b82f6"/>
+                                <rect x="80" y="6" width="3" height="48" rx="1" fill="#3b82f6"/>
+                                <rect x="85" y="16" width="3" height="28" rx="1" fill="#3b82f6"/>
+                                <rect x="90" y="22" width="3" height="16" rx="1" fill="#3b82f6"/>
+                                <rect x="95" y="12" width="3" height="36" rx="1" fill="#3b82f6"/>
+                                <rect x="100" y="18" width="3" height="24" rx="1" fill="#3b82f6"/>
+                                <rect x="105" y="14" width="3" height="32" rx="1" fill="#3b82f6"/>
+                                <rect x="110" y="20" width="3" height="20" rx="1" fill="#3b82f6"/>
+                                <rect x="115" y="8" width="3" height="44" rx="1" fill="#3b82f6"/>
+                                <rect x="120" y="16" width="3" height="28" rx="1" fill="#3b82f6"/>
+                                <rect x="125" y="10" width="3" height="40" rx="1" fill="#a1a1aa"/>
+                                <rect x="130" y="18" width="3" height="24" rx="1" fill="#a1a1aa"/>
+                                <rect x="135" y="12" width="3" height="36" rx="1" fill="#a1a1aa"/>
+                                <rect x="140" y="22" width="3" height="16" rx="1" fill="#a1a1aa"/>
+                                <rect x="145" y="6" width="3" height="48" rx="1" fill="#a1a1aa"/>
+                                <rect x="150" y="14" width="3" height="32" rx="1" fill="#a1a1aa"/>
+                                <rect x="155" y="20" width="3" height="20" rx="1" fill="#a1a1aa"/>
+                                <rect x="160" y="8" width="3" height="44" rx="1" fill="#a1a1aa"/>
+                                <rect x="165" y="16" width="3" height="28" rx="1" fill="#a1a1aa"/>
+                                <rect x="170" y="4" width="3" height="52" rx="1" fill="#a1a1aa"/>
+                                <rect x="175" y="12" width="3" height="36" rx="1" fill="#a1a1aa"/>
+                                <rect x="180" y="18" width="3" height="24" rx="1" fill="#a1a1aa"/>
+                                <rect x="185" y="10" width="3" height="40" rx="1" fill="#a1a1aa"/>
+                                <rect x="190" y="14" width="3" height="32" rx="1" fill="#a1a1aa"/>
+                                <rect x="195" y="22" width="3" height="16" rx="1" fill="#a1a1aa"/>
+                            </svg>
+                        </div>
+                        <div class="lyrics-controls">
+                            <button class="lyrics-play-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            </button>
+                            <span class="lyrics-time">1:24 / 3:42</span>
+                            <div class="lyrics-volume">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                                <div class="volume-slider"><div class="volume-fill"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lyrics-textarea-wrapper">
+                        <div class="lyrics-textarea">I came from the bottom, now I'm here
+Started with nothing, made it clear
+Every step I take, I'm moving near
+To the top where I belong, no fear
+
+They said I couldn't do it, watch me rise
+Breaking through the ceiling, touch the sky
+Every day I grind, no compromise
+Living out my dreams before my eyes</div>
+                    </div>
+                </div>
+
+                <div class="lyrics-dialog-footer">
+                    <button class="lyrics-cancel-btn">Cancel</button>
+                    <button class="lyrics-save-btn">Save Lyrics</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-label">Business</div>
+            <h2>Contract Management</h2>
+            <p>Upload contracts and assign them to projects, individual tracks, or multiple tracks at once. Track what's covered, what's expiring, and what still needs contracts.</p>
+
+            <div class="contracts-preview">
+                <div class="contracts-tabs">
+                    <span class="contracts-tab active">All Contracts</span>
+                    <span class="contracts-tab">Expiring Soon <span class="contracts-badge">3</span></span>
+                    <span class="contracts-tab">Uncontracted <span class="contracts-badge warn">5</span></span>
+                </div>
+
+                <div class="contracts-list">
+                    <div class="contract-row">
+                        <div class="contract-info">
+                            <div class="contract-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </div>
+                            <div>
+                                <div class="contract-name">Distribution Agreement</div>
+                                <div class="contract-meta">Assigned to <strong>Cant Rush Greatness</strong> (Album)</div>
+                            </div>
+                        </div>
+                        <div class="contract-status active">Active</div>
+                        <div class="contract-expiry">Expires Dec 2026</div>
+                    </div>
+
+                    <div class="contract-row">
+                        <div class="contract-info">
+                            <div class="contract-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </div>
+                            <div>
+                                <div class="contract-name">Publishing Split Agreement</div>
+                                <div class="contract-meta">Assigned to <strong>No Introduction, 5 Star, GBP</strong> (3 Tracks)</div>
+                            </div>
+                        </div>
+                        <div class="contract-status active">Active</div>
+                        <div class="contract-expiry">Expires Mar 2025</div>
+                    </div>
+
+                    <div class="contract-row">
+                        <div class="contract-info">
+                            <div class="contract-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            </div>
+                            <div>
+                                <div class="contract-name">Producer Agreement</div>
+                                <div class="contract-meta">Assigned to <strong>CRG</strong> (Track)</div>
+                            </div>
+                        </div>
+                        <div class="contract-status expiring">Expiring Soon</div>
+                        <div class="contract-expiry warn">Expires Jan 2025</div>
+                    </div>
+                </div>
+
+                <div class="contracts-assign-preview">
+                    <div class="contracts-assign-label">Assign contracts to</div>
+                    <div class="contracts-assign-options">
+                        <div class="assign-option">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            Project
+                        </div>
+                        <div class="assign-option">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                            Single Track
+                        </div>
+                        <div class="assign-option">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                            Multiple Tracks
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-label">Business</div>
+            <h2>Invoices</h2>
+            <p>Create and send invoices, track payment status, and stay on top of outstanding payments.</p>
+
+            <div class="invoices-preview">
+                <div class="invoices-summary">
+                    <div class="invoice-stat">
+                        <div class="invoice-stat-value">£12,450</div>
+                        <div class="invoice-stat-label">Outstanding</div>
+                    </div>
+                    <div class="invoice-stat">
+                        <div class="invoice-stat-value">£8,200</div>
+                        <div class="invoice-stat-label">Overdue</div>
+                    </div>
+                    <div class="invoice-stat">
+                        <div class="invoice-stat-value">£45,800</div>
+                        <div class="invoice-stat-label">Paid (This Year)</div>
+                    </div>
+                </div>
+
+                <div class="invoices-list">
+                    <div class="invoices-header">
+                        <span>Invoice</span>
+                        <span>Client</span>
+                        <span>Amount</span>
+                        <span>Status</span>
+                    </div>
+
+                    <div class="invoice-row">
+                        <div class="invoice-id">
+                            <span class="invoice-number">INV-0042</span>
+                            <span class="invoice-date">Dec 10, 2024</span>
+                        </div>
+                        <div class="invoice-client">Sony Music UK</div>
+                        <div class="invoice-amount">£4,500.00</div>
+                        <div class="invoice-status pending">Pending</div>
+                    </div>
+
+                    <div class="invoice-row">
+                        <div class="invoice-id">
+                            <span class="invoice-number">INV-0041</span>
+                            <span class="invoice-date">Dec 1, 2024</span>
+                        </div>
+                        <div class="invoice-client">Atlantic Records</div>
+                        <div class="invoice-amount">£7,950.00</div>
+                        <div class="invoice-status overdue">Overdue</div>
+                    </div>
+
+                    <div class="invoice-row">
+                        <div class="invoice-id">
+                            <span class="invoice-number">INV-0040</span>
+                            <span class="invoice-date">Nov 15, 2024</span>
+                        </div>
+                        <div class="invoice-client">Warner Music</div>
+                        <div class="invoice-amount">£3,200.00</div>
+                        <div class="invoice-status paid">Paid</div>
+                    </div>
+
+                    <div class="invoice-row">
+                        <div class="invoice-id">
+                            <span class="invoice-number">INV-0039</span>
+                            <span class="invoice-date">Nov 8, 2024</span>
+                        </div>
+                        <div class="invoice-client">Universal Music</div>
+                        <div class="invoice-amount">£12,000.00</div>
+                        <div class="invoice-status paid">Paid</div>
+                    </div>
+                </div>
+
+                <div class="invoices-actions">
+                    <button class="invoice-action-btn primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Create Invoice
+                    </button>
+                    <button class="invoice-action-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
